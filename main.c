@@ -244,9 +244,12 @@ void run_simulation(int thread_index)
 	while (time < TotalTime) {
 		float expected_level1 = 0;
 		float expected_level2 = 0;
-		float expected_level3 = 0;
 		float expected_alpha = 0;
 		float expected_beta  = 0;
+
+		complex float expected_21 = 0;
+		complex float expected_31 = 0;
+		complex float expected_32 = 0;
 
 		for (int n1 = nu2; n1 <= nu1; ++n1) {
 			for (int n2 = nu3; n2 <= nu2; ++n2) {
@@ -257,24 +260,36 @@ void run_simulation(int thread_index)
 					float norm = cnormf(wave[index]);
 					expected_level1 += n3 * norm;
 					expected_level2 += (n1 + n2 - n3) * norm;
-
+	
 					for (int i = 0; i < countof(Transition21[index]); ++i) {
+						index_t target = Transition21[index][i].target;
 						float factor = Transition21[index][i].factor;
 						expected_alpha += factor*factor * norm;
+						if (target) expected_21 += conjf(wave[target]) * wave[index] * factor;
 					}
 
 					for (int i = 0; i < countof(Transition32[index]); ++i) {
+						index_t target = Transition32[index][i].target;
 						float factor = Transition32[index][i].factor;
 						expected_beta += factor*factor * norm;
+						if (target) expected_32 += conjf(wave[target]) * wave[index] * factor;
+					}
+
+					for (int i = 0; i < countof(Transition31[index]); ++i) {
+						index_t target = Transition32[index][i].target;
+						float factor = Transition32[index][i].factor;
+						if (target) expected_31 += conjf(wave[target]) * wave[index] * factor;
 					}
 				}
 			}
 		}
 
-		expected_level3 = N - expected_level2 - expected_level1;
-		if (expected_level3 < 0) expected_level3 = 0; // floating point error correction
-
-		fprintf(log, "%g\t%g\t%g\t%g\n", time, expected_level1, expected_level2, expected_level3);
+		fprintf(log, "%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\n", time,
+			expected_level1, expected_level2,
+			crealf(expected_21), cimagf(expected_21),
+			crealf(expected_31), cimagf(expected_31),
+			crealf(expected_32), cimagf(expected_32)
+		);
 
 		float jump_probability = cnormf(alpha) * expected_level1 + cnormf(beta) * expected_level2;
 		float jump_probability_collective = cnormf(alpha_collective) * expected_alpha + cnormf(beta_collective) * expected_beta;

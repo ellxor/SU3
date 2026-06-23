@@ -94,6 +94,7 @@ thread_local struct HamiltonianTableEntry Transition12[Dimension][4];
 thread_local struct HamiltonianTableEntry Transition21[Dimension][4];
 thread_local struct HamiltonianTableEntry Transition23[Dimension][2];
 thread_local struct HamiltonianTableEntry Transition32[Dimension][2];
+thread_local struct HamiltonianTableEntry Transition31[Dimension][2];
 
 thread_local struct LindbladTableEntry4 LindbladJump21[Dimension][Levels*Levels];
 thread_local struct LindbladTableEntry2 LindbladJump32[Dimension][Levels*Levels];
@@ -308,6 +309,7 @@ void update_tables(int nu1, int nu2, int nu3) {
 				hamiltonian_clebsh_gordan(W_nu, Level1, Level2, ratios, GroundToGroundCombinations,  Transition12[index], countof(GroundToGroundCombinations) );
 				hamiltonian_clebsh_gordan(W_nu, Level3, Level2, ratios, GroundToExcitedCombinations, Transition32[index], countof(GroundToExcitedCombinations));
 				hamiltonian_clebsh_gordan(W_nu, Level2, Level3, ratios, ExcitedToGroundCombinations, Transition23[index], countof(ExcitedToGroundCombinations));
+				hamiltonian_clebsh_gordan(W_nu, Level3, Level1, ratios, GroundToExcitedCombinations, Transition32[index], countof(GroundToExcitedCombinations));
 
 				//                           |to>    <from|
 				lindblad_clebsh_gordan(W_nu, Level2, Level1, ratios, GroundToGroundCombinations, (struct LindbladTableEntry *)LindbladJump21[index], countof(GroundToGroundCombinations));
