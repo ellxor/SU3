@@ -1,6 +1,7 @@
 # SU(3) Trajectories
 
 **Instructions:**
+- Download repo using `git clone https://github.com/ellxor/su3 --depth=1`
 - Use the [parameters.h](parameters.h) file to set the parameters for both the model and integration.
 - Build the program using the provided [build.sh](build.sh) script on Linux or macOS.
   - Requirements: `build-essential` package on Linux, or CommandLineTools on macOS (run `xcode-select --install`)
